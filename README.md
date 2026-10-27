@@ -23,9 +23,9 @@ Partially supports:
 
 This repository does not include resource files, so please download them from below. 
 
-- [Download for resource files](https://crystalmark.info/redirect.php?product=CrystalDiskInfo)
+- Windows: [Download for resource files](https://crystalmark.info/redirect.php?product=CrystalDiskInfo)
 
-- [Download for resource files](https://github.com/frrabelo/CrystalDiskInfo/releases)
+- Linux: [Download for resource files](https://github.com/frrabelo/CrystalDiskInfo/releases)
 
 ## Building
 
