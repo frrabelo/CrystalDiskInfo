@@ -35,6 +35,7 @@ jobs:
             libxkbcommon-dev \
             libvulkan-dev \
             smartmontools \
+            patchelf \
             libfuse2 \
             wget \
             file
@@ -62,11 +63,14 @@ jobs:
           chmod +x linuxdeploy*.AppImage
 
       - name: Empacotar AppImage com Bibliotecas Qt6
-        env:
-          APPIMAGE_EXTRACT_AND_RUN: 1
-          QMAKE: /usr/lib/qt6/bin/qmake
-          PATH: /usr/lib/qt6/bin:${{ env.PATH }}
         run: |
+          export PATH="/usr/lib/qt6/bin:$PATH"
+          export QMAKE="/usr/lib/qt6/bin/qmake"
+          export APPIMAGE_EXTRACT_AND_RUN=1
+
+          # Link simbolico para o linuxdeploy encontrar o plugin Qt
+          ln -sf linuxdeploy-plugin-qt-x86_64.AppImage linuxdeploy-plugin-qt
+
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             --plugin qt \
