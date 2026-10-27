@@ -6,10 +6,12 @@ English | [Japanese](./README.ja.md) | [Chinese (Simplified)](./README.sc.md)
 CrystalDiskInfo is a disk information tool.
 
 CrystalDiskInfo supports:
+
 - PATA drives
 - SATA drives
 
 Partially supports:
+
 - USB drives
 - RAID controllers (IRST)
 - NVMe drives
@@ -18,8 +20,12 @@ Partially supports:
 - USB RAID controllers (JMicron JMS56X,JMB39X)
 
 ## Notification
-This repository does not include resource files, so please download them from below.
+
+This repository does not include resource files, so please download them from below. 
+
 - [Download for resource files](https://crystalmark.info/redirect.php?product=CrystalDiskInfo)
+
+- [Download for resource files](https://github.com/frrabelo/CrystalDiskInfo/releases)
 
 ## Building
 
