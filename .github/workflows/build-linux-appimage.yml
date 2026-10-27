@@ -29,10 +29,13 @@ jobs:
             qt6-base-dev \
             qt6-tools-dev \
             qt6-tools-dev-tools \
+            qt6-l10n-tools \
             libqt6svg6-dev \
             libgl1-mesa-dev \
             libxkbcommon-dev \
+            libvulkan-dev \
             smartmontools \
+            libfuse2 \
             wget \
             file
 
@@ -45,11 +48,12 @@ jobs:
           cmake --build build -j$(nproc)
           DESTDIR="$(pwd)/AppDir" cmake --install build
 
-      - name: Preparar AppDir
+      - name: Preparar Estrutura do AppDir
         run: |
-          # Garantir links raiz para compatibilidade AppImage
+          # Garantir arquivos essenciais na raiz do AppDir
           cp -f AppDir/usr/share/applications/*.desktop AppDir/ 2>/dev/null || true
           cp -f AppDir/usr/share/icons/hicolor/256x256/apps/*.png AppDir/ 2>/dev/null || true
+          cp -f AppDir/usr/share/icons/hicolor/scalable/apps/*.svg AppDir/ 2>/dev/null || true
 
       - name: Baixar linuxdeploy e plugin Qt
         run: |
@@ -61,14 +65,15 @@ jobs:
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
           QMAKE: /usr/lib/qt6/bin/qmake
+          PATH: /usr/lib/qt6/bin:${{ env.PATH }}
         run: |
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             --plugin qt \
             --output appimage
           
-          # Padronizar nome do artefato final
-          mv QDiskInfo*.AppImage QDiskInfo-Linux-x86_64.AppImage
+          # Padronizar nome do arquivo final gerado
+          mv QDiskInfo*.AppImage QDiskInfo-Linux-x86_64.AppImage || true
 
       - name: Publicar Artefato AppImage Nativo
         uses: actions/upload-artifact@v4
