@@ -1,0 +1,62 @@
+name: Build Windows 64-bit
+
+on:
+  push:
+    branches: [ master, main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows-x64:
+    name: Compilar CrystalDiskInfo (Release x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Compilar Solucao (Release x64)
+        run: |
+          msbuild DiskInfo.sln /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0 /p:OutDir="${{ github.workspace }}\build_output\" /m
+
+      - name: Montar Estrutura de Distribuicao
+        shell: pwsh
+        run: |
+          $distPath = "CrystalDiskInfo-x64"
+          New-Item -ItemType Directory -Path $distPath -Force
+
+          # Copiar executavel compilado
+          Copy-Item -Path "build_output\DiskInfo64.exe" -Destination "$distPath\DiskInfo64.exe" -Force
+
+          # Copiar pastas e recursos obrigatorios
+          if (Test-Path "Language") {
+            Copy-Item -Path "Language" -Destination "$distPath\Language" -Recurse -Force
+          }
+          if (Test-Path "res") {
+            Copy-Item -Path "res" -Destination "$distPath\res" -Recurse -Force
+          }
+          if (Test-Path "CdiResource") {
+            Copy-Item -Path "CdiResource" -Destination "$distPath\CdiResource" -Recurse -Force
+          }
+
+          # Copiar licenca e documentacao
+          Copy-Item -Path "LICENSE.txt" -Destination "$distPath\LICENSE.txt" -Force -ErrorAction SilentlyContinue
+          Copy-Item -Path "README.md" -Destination "$distPath\README.md" -Force -ErrorAction SilentlyContinue
+
+      - name: Compactar Arquivo (.zip)
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "CrystalDiskInfo-x64\*" -DestinationPath "CrystalDiskInfo-x64.zip" -CompressionLevel Optimal -Force
+
+      - name: Publicar Artefato Compactado (.zip)
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrystalDiskInfo-Windows-x64
+          path: CrystalDiskInfo-x64.zip
+          retention-days: 30
