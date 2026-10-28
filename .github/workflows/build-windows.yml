@@ -28,6 +28,15 @@ jobs:
             Start-Process -FilePath $vsInstaller -ArgumentList "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Component.VC.ATLMFC --add Microsoft.VisualStudio.Component.VC.ATLMFC.Spectre --quiet --norestart --nocache" -Wait -NoNewWindow
           }
 
+      - name: Baixar Recursos Oficiais (CdiResource)
+        shell: pwsh
+        run: |
+          Write-Host "Baixando pacote oficial de recursos da interface (CdiResource)..."
+          $zipPath = "$env:TEMP\cdi_res.zip"
+          curl.exe -L -o $zipPath "https://sourceforge.net/projects/crystaldiskinfo/files/latest/download"
+          tar -xf $zipPath CdiResource
+          Remove-Item $zipPath -Force
+
       - name: Configurar MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -44,15 +53,15 @@ jobs:
           # Executavel compilado
           Copy-Item -Path "build_output\DiskInfo64.exe" -Destination "$distPath\DiskInfo64.exe" -Force
 
-          # Pastas e recursos obrigatorios
+          # Pastas e recursos obrigatorios de runtime
+          if (Test-Path "CdiResource") {
+            Copy-Item -Path "CdiResource" -Destination "$distPath\CdiResource" -Recurse -Force
+          }
           if (Test-Path "Language") {
             Copy-Item -Path "Language" -Destination "$distPath\Language" -Recurse -Force
           }
           if (Test-Path "res") {
             Copy-Item -Path "res" -Destination "$distPath\res" -Recurse -Force
-          }
-          if (Test-Path "CdiResource") {
-            Copy-Item -Path "CdiResource" -Destination "$distPath\CdiResource" -Recurse -Force
           }
 
           # Documentacao e licenca
