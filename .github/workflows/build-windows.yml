@@ -12,11 +12,21 @@ on:
 jobs:
   build-windows-x64:
     name: Compilar CrystalDiskInfo (Release x64)
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Checkout do repositorio
         uses: actions/checkout@v4
+
+      - name: Garantir Bibliotecas MFC
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $vsInstaller = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          if (Test-Path $vsInstaller) {
+            Write-Host "Verificando MFC no Visual Studio: $vsPath"
+            Start-Process -FilePath $vsInstaller -ArgumentList "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Component.VC.ATLMFC --add Microsoft.VisualStudio.Component.VC.ATLMFC.Spectre --quiet --norestart --nocache" -Wait -NoNewWindow
+          }
 
       - name: Configurar MSBuild
         uses: microsoft/setup-msbuild@v2
